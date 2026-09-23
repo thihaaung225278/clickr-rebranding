@@ -350,7 +350,7 @@
 }
 
 /* Beat `.tl-root button { border: 0; color: inherit }` (0,1,1). */
-.tl-root .hud-nav {
+.tl-root .hud-nav.brand-side-fill {
   position: absolute;
   z-index: 20;
   pointer-events: auto;
@@ -364,19 +364,27 @@
   padding: 0;
   border: 2px solid currentColor;
   border-radius: 0;
-  background: transparent;
   color: var(--brand, #ff6900);
   cursor: pointer;
   transform: translateY(-50%);
+  background-color: transparent;
+  background-image: linear-gradient(
+    var(--brand, #ff6900),
+    var(--brand, #ff6900)
+  );
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0% 100%;
   transition:
-    opacity 0.2s ease,
-    color 0.2s ease,
-    background-color 0.2s ease;
+    background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
 }
 
-.tl-root .hud-nav:hover:not(:disabled) {
-  background-color: var(--brand, #ff6900);
-  color: #fff;
+.tl-root .hud-nav.brand-side-fill:hover:not(:disabled),
+.tl-root .hud-nav.brand-side-fill:focus-visible:not(:disabled) {
+  background-size: 100% 100%;
+  color: #ffffff;
 }
 
 .tl-root .hud-nav:focus-visible {
@@ -424,23 +432,51 @@
   gap: 0.4rem;
 }
 
-/* Beat `.tl-root button { background: transparent; color: inherit }` (0,1,1). */
-.tl-root .tools-launch {
+/* Beat `.tl-root button { background: transparent; color: inherit }` (0,1,1).
+   Outlined idle so side water-fill is visible (match HUD nav).
+   Side-fill + white icon MUST live here — globals `.brand-side-fill` loses to
+   `.tl-root button { background: … }` shorthand (resets background-image). */
+.tl-root .tools-launch.brand-side-fill {
+  box-sizing: border-box;
   width: 2.85rem;
   height: 2.85rem;
-  border-radius: 0.3rem;
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 0.55rem color-mix(in oklab, var(--accent) 35%, transparent);
+  border: 2px solid currentColor;
+  border-radius: 0;
+  color: var(--brand, #ff6900);
+  box-shadow: none;
   line-height: 1;
   display: grid;
   place-items: center;
+  cursor: pointer;
+  grid-template: 1fr / 1fr;
+  background-color: transparent;
+  background-image: linear-gradient(
+    var(--brand, #ff6900),
+    var(--brand, #ff6900)
+  );
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 0% 100%;
+  transition:
+    background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+}
+
+.tl-root .tools-launch.brand-side-fill:hover,
+.tl-root .tools-launch.brand-side-fill:focus-visible,
+.tl-root .tools-launch.brand-side-fill[aria-expanded="true"] {
+  background-size: 100% 100%;
+  color: #ffffff;
 }
 
 .tl-root .tools-launch-icon {
   width: 1.45rem;
   height: 1.45rem;
   display: block;
+  grid-area: 1 / 1;
+  pointer-events: none;
+  color: inherit;
 }
 
 .tl-root .tools-launch-search {
@@ -450,6 +486,12 @@
 .tl-root .tools-launch:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-root .tools-launch.brand-side-fill {
+    transition: none;
+  }
 }
 
 .tools-panel {
@@ -1099,6 +1141,8 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+  /* Win over any `> * { position: relative }` utility if reintroduced. */
+  z-index: 0;
 }
 
 @media (max-width: 40rem) {

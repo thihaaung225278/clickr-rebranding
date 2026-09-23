@@ -21,3 +21,6 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Side-fill hover for icon buttons is defined next to each control
+   (HomeHero / TimelineCorridor) so it beats scoped `button { background }` resets. */

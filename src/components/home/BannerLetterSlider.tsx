@@ -305,7 +305,7 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
 
             <button
               type="button"
-              className="banner-slider__nav banner-slider__nav--prev"
+              className="brand-side-fill banner-slider__nav banner-slider__nav--prev"
               aria-label="Previous letter"
               disabled={!armed}
               onClick={() => go(-1)}
@@ -331,7 +331,7 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
 
             <button
               type="button"
-              className="banner-slider__nav banner-slider__nav--next"
+              className="brand-side-fill banner-slider__nav banner-slider__nav--next"
               aria-label="Next letter"
               disabled={!armed}
               onClick={() => go(1)}

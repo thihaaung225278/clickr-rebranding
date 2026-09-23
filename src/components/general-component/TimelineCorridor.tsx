@@ -580,7 +580,7 @@ export default function TimelineCorridor({
           <>
             <button
               type="button"
-              className="hud hud-nav hud-nav-prev"
+              className="brand-side-fill hud hud-nav hud-nav-prev"
               aria-label={isCompanyTimeline ? "Previous milestone" : "Previous monarch"}
               disabled={activeIndex <= 0}
               onClick={() => step(-1)}
@@ -605,7 +605,7 @@ export default function TimelineCorridor({
             </button>
             <button
               type="button"
-              className="hud hud-nav hud-nav-next"
+              className="brand-side-fill hud hud-nav hud-nav-next"
               aria-label={isCompanyTimeline ? "Next milestone" : "Next monarch"}
               disabled={activeIndex >= filtered.length - 1}
               onClick={() => step(1)}
@@ -677,7 +677,7 @@ export default function TimelineCorridor({
         <aside className="tools">
           <button
             type="button"
-            className="tools-launch tools-launch-search"
+            className="brand-side-fill tools-launch tools-launch-search"
             aria-expanded={toolsOpen}
             aria-controls="tools-panel"
             title="Search tools"
