@@ -1,7 +1,7 @@
 /* Home banner letter slider — CSS motion only (no gsap). */
 
 .banner-slider {
-  background: var(--surface, #f7f5f1);
+  background: #ffffff;
   --fill-ms: 2000ms;
 }
 
@@ -9,13 +9,19 @@
   pointer-events: none;
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(
-      110% 70% at 72% 28%,
-      color-mix(in oklab, var(--brand) 10%, transparent) 0%,
-      transparent 52%
-    ),
-    linear-gradient(160deg, #f4f5f6 0%, #e8eaed 55%, #dde1e6 100%);
+  z-index: 0;
+  /* Page chrome stays plain white — brand dots live only in the letter WebGL stage. */
+  background: #ffffff;
+}
+
+/* Left letter rail — thin brand wash into white (does not tint the WebGL stage). */
+.banner-slider__rail {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--brand) 16%, #ffffff) 0%,
+    color-mix(in oklab, var(--brand) 5%, #ffffff) 45%,
+    #ffffff 80%
+  );
 }
 
 .banner-slider__glyph {
@@ -222,10 +228,60 @@
   display: block;
   width: 100%;
   height: 100%;
+  background: #ffffff;
 }
 
 .banner-slider__stage {
   min-height: 0;
+  background: #ffffff;
+}
+
+.banner-slider__stage-canvas {
+  z-index: 0;
+}
+
+.banner-slider__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--brand, #ff6900);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.banner-slider__nav:hover:not(:disabled) {
+  color: color-mix(in oklab, var(--brand, #ff6900) 82%, var(--ink, #1a1a1a));
+}
+
+.banner-slider__nav:focus-visible {
+  outline: 2px solid var(--brand, #ff6900);
+  outline-offset: 4px;
+}
+
+.banner-slider__nav:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+.banner-slider__nav--prev {
+  left: clamp(0.5rem, 1.5vw, 1.25rem);
+}
+
+.banner-slider__nav--next {
+  right: clamp(0.5rem, 1.5vw, 1.25rem);
+}
+
+.banner-slider__nav-icon {
+  display: block;
 }
 
 .banner-slider__eyebrow {
@@ -236,8 +292,38 @@
   animation: banner-fade-up 0.7s ease-out 0.06s both;
 }
 
-.banner-slider__lede {
+.banner-slider__lede-block {
   animation: banner-fade-up 0.7s ease-out 0.12s both;
+}
+
+.banner-slider__lede-clip {
+  overflow: hidden;
+  /* Fallback ~2 lines before JS measures (avoids full-text flash). */
+  max-height: 3.25em;
+  transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.banner-slider__lede-clip--instant {
+  transition: none;
+}
+
+.banner-slider__lede {
+  margin: 0;
+}
+
+.banner-slider__see-more {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  transition: opacity 0.2s ease;
+}
+
+.banner-slider__see-more:hover {
+  opacity: 0.82;
 }
 
 .banner-slider__cta {
@@ -258,9 +344,13 @@
 @media (prefers-reduced-motion: reduce) {
   .banner-slider__eyebrow,
   .banner-slider__headline,
-  .banner-slider__lede,
+  .banner-slider__lede-block,
   .banner-slider__cta {
     animation: none;
+  }
+
+  .banner-slider__lede-clip {
+    transition: none;
   }
 
   .banner-slider__glyph--filling .banner-slider__glyph-liquid {

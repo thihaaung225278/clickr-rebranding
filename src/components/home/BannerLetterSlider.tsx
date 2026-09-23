@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createLetter3D,
   type Letter3DHandle,
@@ -22,6 +22,12 @@ function glyphPhase(index: number, activeIndex: number): GlyphPhase {
   return "pending";
 }
 
+/** Collapsed lede line count before See more. */
+const LEDE_CLAMP_LINES = 2;
+
+const LEDE_COPY =
+  "We engineer marketing as a system. Every product runs the same loop: it cuts the hours and cost of running your marketing first, and growth compounds from there. Nothing ships without the client's yes, and every yes is on record.";
+
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -35,18 +41,131 @@ function usePrefersReducedMotion(): boolean {
 }
 
 /**
+ * Banner lede: clamp when overflowing, expand/collapse with max-height animation.
+ */
+function BannerLede({
+  reducedMotion,
+  expanded,
+  onExpandedChange,
+}: {
+  reducedMotion: boolean;
+  expanded: boolean;
+  onExpandedChange: (next: boolean) => void;
+}) {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [needsMore, setNeedsMore] = useState(false);
+  const [maxHeight, setMaxHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+
+    const sync = () => {
+      const styles = getComputedStyle(el);
+      const parsedLh = parseFloat(styles.lineHeight);
+      const fontSize = parseFloat(styles.fontSize) || 16;
+      const lineHeight = Number.isFinite(parsedLh) ? parsedLh : fontSize * 1.625;
+      const collapsedH = Math.ceil(lineHeight * LEDE_CLAMP_LINES);
+      const fullH = el.scrollHeight;
+      setNeedsMore(fullH > collapsedH + 1);
+      setMaxHeight(expanded ? fullH : Math.min(fullH, collapsedH));
+    };
+
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [expanded]);
+
+  const showToggle = needsMore || expanded;
+
+  return (
+    <div className="banner-slider__lede-block mt-4">
+      <div
+        className={`banner-slider__lede-clip${reducedMotion ? " banner-slider__lede-clip--instant" : ""}`}
+        style={maxHeight !== undefined ? { maxHeight } : undefined}
+      >
+        <p
+          ref={textRef}
+          id="banner-lede"
+          className="banner-slider__lede font-sans text-base leading-relaxed text-[var(--ink-muted)] sm:text-lg"
+        >
+          {LEDE_COPY}
+        </p>
+      </div>
+      {showToggle ? (
+        <button
+          type="button"
+          className="banner-slider__see-more mt-2 font-sans text-sm font-semibold text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]"
+          aria-expanded={expanded}
+          aria-controls="banner-lede"
+          onClick={() => onExpandedChange(!expanded)}
+        >
+          {expanded ? "See less" : "See more"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+/**
  * Home banner: left vertical Clickr auto-active rail + right 3D letter stage.
  * `armed` gates autoplay until the home intro overlay finishes.
  */
 export default function BannerLetterSlider({ armed }: { armed: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const stageWrapRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<Letter3DHandle | null>(null);
+  const viewportKeyRef = useRef("");
+  const pendingStageRelockRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [webglOk, setWebglOk] = useState(true);
   const [cursorOn, setCursorOn] = useState(false);
+  const [stageLockPx, setStageLockPx] = useState<number | null>(null);
+  const [ledeExpanded, setLedeExpanded] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
+
+  /** Freeze stage height so lede expand grows the banner downward (no WebGL resize flicker). */
+  const lockStageHeight = useCallback(() => {
+    const wrap = stageWrapRef.current;
+    if (!wrap) return;
+
+    setStageLockPx(null);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const h = Math.round(wrap.clientHeight);
+        if (h > 0) setStageLockPx(h);
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (ledeExpanded) return;
+    if (pendingStageRelockRef.current) {
+      pendingStageRelockRef.current = false;
+    }
+    lockStageHeight();
+  }, [ledeExpanded, lockStageHeight]);
+
+  useEffect(() => {
+    viewportKeyRef.current = `${window.innerWidth}x${window.innerHeight}`;
+
+    const onResize = () => {
+      const key = `${window.innerWidth}x${window.innerHeight}`;
+      if (key === viewportKeyRef.current) return;
+      viewportKeyRef.current = key;
+      if (ledeExpanded) {
+        pendingStageRelockRef.current = true;
+        return;
+      }
+      lockStageHeight();
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [ledeExpanded, lockStageHeight]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -124,13 +243,21 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
     setActiveIndex((i) => (i + 1) % LETTERS.length);
   };
 
+  const go = (delta: number) => {
+    if (!armed) return;
+    setActiveIndex((i) => {
+      const next = (i + delta) % LETTERS.length;
+      return next < 0 ? next + LETTERS.length : next;
+    });
+  };
+
   const activeChar = LETTERS[activeIndex] ?? "C";
 
   return (
     <section
       ref={sectionRef}
       aria-labelledby="home-brand"
-      className={`banner-slider relative isolate flex h-dvh flex-col overflow-hidden${cursorOn ? " banner-slider--custom-cursor" : ""}`}
+      className={`banner-slider relative isolate flex min-h-dvh flex-col overflow-x-hidden${cursorOn ? " banner-slider--custom-cursor" : ""}`}
       style={{ ["--fill-ms" as string]: `${AUTO_MS}ms` }}
     >
       <div className="banner-slider__atmosphere" aria-hidden="true" />
@@ -218,10 +345,72 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
           <div
-            ref={stageRef}
-            className="banner-slider__stage relative min-h-0 w-full flex-1"
-            aria-hidden="true"
-          />
+            ref={stageWrapRef}
+            className={
+              stageLockPx != null
+                ? "banner-slider__stage relative w-full shrink-0"
+                : "banner-slider__stage relative min-h-0 w-full flex-1"
+            }
+            style={stageLockPx != null ? { height: stageLockPx } : undefined}
+          >
+            <div
+              ref={stageRef}
+              className="banner-slider__stage-canvas absolute inset-0"
+              aria-hidden="true"
+            />
+
+            <button
+              type="button"
+              className="banner-slider__nav banner-slider__nav--prev"
+              aria-label="Previous letter"
+              disabled={!armed}
+              onClick={() => go(-1)}
+            >
+              <svg
+                className="banner-slider__nav-icon"
+                viewBox="0 0 24 40"
+                width="36"
+                height="56"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M15 6 L7 20 L15 34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              className="banner-slider__nav banner-slider__nav--next"
+              aria-label="Next letter"
+              disabled={!armed}
+              onClick={() => go(1)}
+            >
+              <svg
+                className="banner-slider__nav-icon"
+                viewBox="0 0 24 40"
+                width="36"
+                height="56"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M9 6 L17 20 L9 34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
 
           {!webglOk ? (
             <div
@@ -248,12 +437,11 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
               Your marketing{" "}
               <span className="text-brand">shouldn&apos;t be.</span>
             </p>
-            <p className="banner-slider__lede mt-4 font-sans text-base leading-relaxed text-[var(--ink-muted)] sm:text-lg">
-              We engineer marketing as a system. Every product runs the same
-              loop: it cuts the hours and cost of running your marketing first,
-              and growth compounds from there. Nothing ships without the
-              client&apos;s yes, and every yes is on record.
-            </p>
+            <BannerLede
+              reducedMotion={reducedMotion}
+              expanded={ledeExpanded}
+              onExpandedChange={setLedeExpanded}
+            />
             <div className="banner-slider__cta mt-7 flex flex-wrap gap-3">
               <a
                 href={CTA_HOW_IT_WORKS}

@@ -6,7 +6,13 @@
   z-index: 100;
   display: grid;
   place-items: center;
-  background: var(--surface);
+  /* Match banner left rail — thin brand wash into white. */
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--brand) 16%, #ffffff) 0%,
+    color-mix(in oklab, var(--brand) 5%, #ffffff) 45%,
+    #ffffff 80%
+  );
   transition: opacity 0.42s ease, visibility 0.42s ease;
 }
 

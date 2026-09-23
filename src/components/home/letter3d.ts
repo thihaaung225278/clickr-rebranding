@@ -1,18 +1,62 @@
 /**
  * Vanilla Three.js letter stage for the home banner.
  * Mount / setLetter / dispose — mirrors corridor3d lifecycle (no R3F).
+ * Brand dots: single even Points grid behind the letter (stage-scoped; static).
  */
 import * as THREE from "three";
 import { Font, FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
 const BRAND = 0xff6900;
+const STAGE_WHITE = 0xffffff;
 const FONT_URL = "/fonts/helvetiker_bold.typeface.json";
+
+/** Single even grid behind the letter — one plane, no drift (avoids dizzy stacking). */
+const DOT_COLS = 18;
+const DOT_ROWS = 13;
+const DOT_SPACING = 0.7;
+const DOT_Z = -2.4;
 
 export interface Letter3DHandle {
   setLetter(char: string): void;
   setPaused(value: boolean): void;
   dispose(): void;
+}
+
+function buildDotField(): {
+  points: THREE.Points;
+  geometry: THREE.BufferGeometry;
+  material: THREE.PointsMaterial;
+} {
+  const positions: number[] = [];
+  const x0 = -((DOT_COLS - 1) * DOT_SPACING) / 2;
+  const y0 = -((DOT_ROWS - 1) * DOT_SPACING) / 2;
+
+  for (let row = 0; row < DOT_ROWS; row++) {
+    for (let col = 0; col < DOT_COLS; col++) {
+      positions.push(x0 + col * DOT_SPACING, y0 + row * DOT_SPACING, DOT_Z);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+
+  const material = new THREE.PointsMaterial({
+    color: BRAND,
+    size: 0.1,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false,
+  });
+
+  const points = new THREE.Points(geometry, material);
+  points.renderOrder = -1;
+  points.frustumCulled = false;
+  return { points, geometry, material };
 }
 
 export function createLetter3D(
@@ -28,8 +72,8 @@ export function createLetter3D(
   let pendingChar = options.initialLetter ?? "C";
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe8eaed);
-  scene.fog = new THREE.Fog(0xe8eaed, 6, 18);
+  scene.background = new THREE.Color(STAGE_WHITE);
+  scene.fog = null;
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 40);
   camera.position.set(0, 0.15, 4.2);
@@ -62,6 +106,10 @@ export function createLetter3D(
 
   const root = new THREE.Group();
   scene.add(root);
+
+  const dotField = buildDotField();
+  const dots = dotField.points;
+  scene.add(dots);
 
   const material = new THREE.MeshPhysicalMaterial({
     color: BRAND,
@@ -161,6 +209,9 @@ export function createLetter3D(
       disposed = true;
       ro.disconnect();
       disposeLetter();
+      scene.remove(dots);
+      dotField.geometry.dispose();
+      dotField.material.dispose();
       material.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode) {
