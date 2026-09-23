@@ -3,7 +3,7 @@
  * Visual SoT: ChronoFlo official preview (preview-english-monarchs.jpg) —
  * opaque cards (colored house strip + portrait + dark copy), white ruler road,
  * three horizontal lanes (no proprietary band JS), right-side year labels,
- * steeper vanishing stack + floor reflections.
+ * steeper vanishing stack (no floor mirror — looks wrong on white corridor).
  */
 import * as THREE from "three";
 
@@ -380,7 +380,6 @@ export function createCorridor3D(
 
   type CardEntry = {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
-    reflection: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
     index: number;
     id: string;
     loaded: boolean;
@@ -436,13 +435,8 @@ export function createCorridor3D(
       entry.mesh.material.map = null;
       entry.mesh.material.dispose();
     }
-    if (entry.reflection?.material) {
-      entry.reflection.material.map = null;
-      entry.reflection.material.dispose();
-    }
     if (map) map.dispose();
     if (entry.mesh) cardRoot.remove(entry.mesh);
-    if (entry.reflection) cardRoot.remove(entry.reflection);
   }
 
   function clearRuler() {
@@ -533,8 +527,6 @@ export function createCorridor3D(
     texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     entry.mesh.material.map = texture;
     entry.mesh.material.needsUpdate = true;
-    entry.reflection.material.map = texture;
-    entry.reflection.material.needsUpdate = true;
     entry.texture = texture;
     entry.loaded = true;
     if (prev && prev !== texture) prev.dispose();
@@ -601,21 +593,9 @@ export function createCorridor3D(
       mesh.position.set(laneX(index), 1.68, worldZForIndex(index));
       mesh.userData = { index, id: item.id };
 
-      const reflMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.28,
-        side: THREE.FrontSide,
-        depthWrite: false,
-      });
-      const reflection = new THREE.Mesh(planeGeo, reflMat);
-      reflection.userData = { index, id: item.id, isReflection: true };
-      reflection.renderOrder = -1;
-
-      cardRoot.add(mesh, reflection);
+      cardRoot.add(mesh);
       cards.push({
         mesh,
-        reflection,
         index,
         id: item.id,
         loaded: false,
@@ -648,8 +628,6 @@ export function createCorridor3D(
       const d = entry.index - activeIndex;
       const visible = d >= -VISIBLE_BEHIND && d <= VISIBLE_AHEAD;
       entry.mesh.visible = visible;
-      // Floor reflections for active + nearby ahead (preview stack)
-      entry.reflection.visible = visible && d >= 0 && d <= 7;
 
       const z = -entry.index * space;
       const x = laneX(entry.index);
@@ -662,13 +640,8 @@ export function createCorridor3D(
       const opacity =
         d < 0 ? 0.38 : d === 0 ? 1 : Math.max(0.35, 1 - d * 0.07);
       entry.mesh.material.opacity = opacity;
-      entry.reflection.material.opacity = opacity * (d === 0 ? 0.3 : 0.14);
-      entry.reflection.scale.set(scale, -scale * 0.94, scale);
-      entry.reflection.position.set(x, 0.035, z);
 
       entry.mesh.lookAt(camera.position.x, entry.mesh.position.y, camera.position.z);
-      entry.reflection.quaternion.copy(entry.mesh.quaternion);
-      entry.reflection.scale.y = -Math.abs(entry.reflection.scale.y);
 
       if (visible) ensureTexture(entry, items[entry.index]);
     });
@@ -724,13 +697,6 @@ export function createCorridor3D(
     cards.forEach((entry) => {
       if (!entry.mesh.visible) return;
       entry.mesh.lookAt(camera.position.x, entry.mesh.position.y, camera.position.z);
-      entry.reflection.quaternion.copy(entry.mesh.quaternion);
-      entry.reflection.scale.y = -Math.abs(entry.mesh.scale.y) * 0.94;
-      entry.reflection.scale.x = entry.mesh.scale.x;
-      entry.reflection.scale.z = entry.mesh.scale.z;
-      entry.reflection.position.x = entry.mesh.position.x;
-      entry.reflection.position.z = entry.mesh.position.z;
-      entry.reflection.position.y = 0.035;
     });
     renderer.render(scene, camera);
   }
