@@ -584,7 +584,23 @@ export default function TimelineCorridor({
               disabled={activeIndex <= 0}
               onClick={() => step(-1)}
             >
-              ‹
+              <svg
+                className="hud-nav-icon"
+                viewBox="0 0 24 40"
+                width="36"
+                height="56"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M15 6 L7 20 L15 34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
             <button
               type="button"
@@ -593,7 +609,23 @@ export default function TimelineCorridor({
               disabled={activeIndex >= filtered.length - 1}
               onClick={() => step(1)}
             >
-              ›
+              <svg
+                className="hud-nav-icon"
+                viewBox="0 0 24 40"
+                width="36"
+                height="56"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M9 6 L17 20 L9 34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
             <p className="hud hud-hint">
               {useWebGL
@@ -653,7 +685,30 @@ export default function TimelineCorridor({
               setToolsOpen((o) => !o);
             }}
           >
-            <span aria-hidden>⌕</span>
+            <svg
+              className="tools-launch-icon"
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle
+                cx="10.5"
+                cy="10.5"
+                r="6.25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.35"
+              />
+              <path
+                d="M15.75 15.75 20.25 20.25"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.35"
+                strokeLinecap="round"
+              />
+            </svg>
             <span className="sr-only">Search</span>
           </button>
           <div
