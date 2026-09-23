@@ -1,0 +1,102 @@
+/* Home loading intro — SoT hands 1 → 2 → text GO, then site */
+
+.hand-intro__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  transition: opacity 0.42s ease, visibility 0.42s ease;
+}
+
+.hand-intro__overlay--out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.hand-intro__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.65rem, 1.8vh, 1.1rem);
+}
+
+.hand-intro__svg {
+  display: block;
+  width: min(38vw, 11.5rem);
+  height: auto;
+  overflow: visible;
+}
+
+.hand-intro__svg--go {
+  width: min(64vw, 20rem);
+}
+
+.hand-intro__stroke,
+.hand-intro__go-text {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.hand-intro__go-text {
+  font-family: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  font-size: 96px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0;
+}
+
+.hand-intro__svg--draw .hand-intro__stroke {
+  animation: hand-stroke-draw 0.95s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.hand-intro__svg--draw .hand-intro__go-text {
+  animation:
+    hand-stroke-draw 0.95s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+    hand-go-fade 0.95s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.hand-intro__svg--instant .hand-intro__stroke,
+.hand-intro__svg--instant .hand-intro__go-text {
+  stroke-dashoffset: 0;
+  animation: none;
+  opacity: 1;
+}
+
+.hand-intro__count {
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--brand);
+  opacity: 0.85;
+}
+
+@keyframes hand-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hand-go-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hand-intro__overlay {
+    transition: none;
+  }
+
+  .hand-intro__svg--draw .hand-intro__stroke,
+  .hand-intro__svg--draw .hand-intro__go-text {
+    stroke-dashoffset: 0;
+    animation: none;
+    opacity: 1;
+  }
+}

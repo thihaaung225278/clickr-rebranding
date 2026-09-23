@@ -32,6 +32,6 @@ const BannerLetterSlider = dynamic(() => import("./BannerLetterSlider"), {
   ),
 });
 
-export default function HomeHero() {
-  return <BannerLetterSlider />;
+export default function HomeHero({ armed }: { armed: boolean }) {
+  return <BannerLetterSlider armed={armed} />;
 }

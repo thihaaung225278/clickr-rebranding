@@ -36,8 +36,9 @@ function usePrefersReducedMotion(): boolean {
 
 /**
  * Home banner: left vertical Clickr auto-active rail + right 3D letter stage.
+ * `armed` gates autoplay until the home intro overlay finishes.
  */
-export default function BannerLetterSlider() {
+export default function BannerLetterSlider({ armed }: { armed: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -58,6 +59,7 @@ export default function BannerLetterSlider() {
         initialLetter: LETTERS[0],
       });
       handleRef.current = handle;
+      handle.setPaused(true);
       setWebglOk(true);
     } catch (err) {
       console.warn("Banner Letter3D unavailable — 2D fallback", err);
@@ -77,21 +79,21 @@ export default function BannerLetterSlider() {
   }, [activeIndex]);
 
   useEffect(() => {
-    handleRef.current?.setPaused(reducedMotion);
-  }, [reducedMotion]);
+    handleRef.current?.setPaused(reducedMotion || !armed);
+  }, [reducedMotion, armed]);
 
-  // Reduced motion: no water animation — advance on a timer only.
+  // Reduced motion: no water animation — advance on a timer only (after armed).
   useEffect(() => {
-    if (!reducedMotion) return;
+    if (!armed || !reducedMotion) return;
     const id = window.setTimeout(() => {
       setActiveIndex((i) => (i + 1) % LETTERS.length);
     }, AUTO_MS);
     return () => window.clearTimeout(id);
-  }, [activeIndex, reducedMotion]);
+  }, [activeIndex, reducedMotion, armed]);
 
   // Fine-pointer custom cursor: arrow tip + brand "c" (DOM transform, no re-render per move).
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !armed) return;
     const section = sectionRef.current;
     const cursor = cursorRef.current;
     if (!section || !cursor) return;
@@ -115,9 +117,10 @@ export default function BannerLetterSlider() {
       section.removeEventListener("pointerleave", onLeave);
       setCursorOn(false);
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, armed]);
 
   const advance = () => {
+    if (!armed) return;
     setActiveIndex((i) => (i + 1) % LETTERS.length);
   };
 
@@ -163,7 +166,7 @@ export default function BannerLetterSlider() {
           className="banner-slider__rail flex w-1/4 shrink-0 flex-col items-center justify-center gap-[clamp(0.2rem,0.9vh,0.65rem)] overflow-hidden border-r border-[color-mix(in_oklab,var(--ink)_12%,transparent)] py-5"
         >
           {LETTERS.map((letter, index) => {
-            const phase = glyphPhase(index, activeIndex);
+            const phase = armed ? glyphPhase(index, activeIndex) : "pending";
             const isActive = phase === "filling";
             const phaseClass =
               isActive
@@ -181,7 +184,10 @@ export default function BannerLetterSlider() {
                 className={`banner-slider__glyph font-display text-[clamp(2.75rem,6.2vw,4.75rem)] font-bold leading-none tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)] ${phaseClass}`}
                 aria-current={isActive ? "true" : undefined}
                 aria-label={`Letter ${letter}`}
-                onClick={() => setActiveIndex(index)}
+                onClick={() => {
+                  if (!armed) return;
+                  setActiveIndex(index);
+                }}
               >
                 <span className="banner-slider__glyph-outline" aria-hidden="true">
                   {letter}
@@ -189,7 +195,7 @@ export default function BannerLetterSlider() {
                 <span
                   key={
                     isActive && !reducedMotion
-                      ? `fill-${activeIndex}`
+                      ? `fill-${activeIndex}-armed`
                       : undefined
                   }
                   className="banner-slider__glyph-liquid"
