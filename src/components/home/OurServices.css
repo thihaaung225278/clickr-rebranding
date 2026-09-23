@@ -89,6 +89,8 @@
   background: #ffffff;
   color: var(--ink);
   transition: color 0.25s ease;
+  perspective: 42rem;
+  transform-style: preserve-3d;
 }
 
 /* Soft brand tint — rises like water when --filling is armed (not :hover). */
@@ -112,11 +114,15 @@
 .our-services__media-index {
   position: relative;
   z-index: 1;
+  /* Same display face as site headings (Figtree) — avoid faux-3D that reads as a different font */
+  font-family: var(--font-display), var(--font-figtree), ui-sans-serif, system-ui,
+    sans-serif;
   font-size: clamp(1.35rem, 3.2vw, 2.25rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--brand);
+  text-shadow: 0 0.06em 0.1em color-mix(in oklab, var(--ink) 12%, transparent);
 }
 
 .our-services__media-label {
@@ -152,12 +158,12 @@
 
 .our-services__stroke {
   stroke: var(--brand);
-  stroke-width: 2.25;
+  /* User units. ~2.5px on the 68rem stage; non-scaling-stroke clips dashes in Chrome. */
+  stroke-width: 0.85;
   stroke-linecap: square;
   stroke-linejoin: miter;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  vector-effect: non-scaling-stroke;
+  stroke-dasharray: var(--stroke-len);
+  stroke-dashoffset: var(--stroke-len);
 }
 
 .our-services__lattice--draw .our-services__stroke {
@@ -282,13 +288,14 @@
   letter-spacing: -0.02em;
   line-height: 1.15;
   text-transform: uppercase;
+  color: var(--brand);
 }
 
 .our-services__dialog-close {
   flex-shrink: 0;
   margin: 0;
   padding: 0.35rem 0.65rem;
-  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border: 1px solid var(--brand);
   background: #ffffff;
   color: var(--ink);
   font-size: 0.75rem;
@@ -299,7 +306,7 @@
 }
 
 .our-services__dialog-close:hover {
-  border-color: var(--brand);
+  background: color-mix(in oklab, var(--brand) 10%, #ffffff);
   color: var(--brand);
 }
 
@@ -322,19 +329,31 @@
 }
 
 .our-services__dialog-list {
-  margin: 1rem 0 0;
-  padding: 0 0 0 1.15rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
   font-size: 0.95rem;
   line-height: 1.55;
   color: var(--ink);
 }
 
 .our-services__dialog-list li {
-  margin: 0.35rem 0;
+  position: relative;
+  margin: 0.45rem 0;
+  padding-left: 1.35rem;
 }
 
-.our-services__dialog-list li::marker {
-  color: var(--brand);
+/* Decorative brand chevron — empty content so screen readers skip it */
+.our-services__dialog-list li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.42em;
+  width: 0.42em;
+  height: 0.42em;
+  border-top: 2px solid var(--brand);
+  border-right: 2px solid var(--brand);
+  transform: rotate(45deg);
 }
 
 @media (max-width: 40rem) {
@@ -349,13 +368,19 @@
   }
 
   .our-services__stroke {
-    stroke-width: 1.85;
+    stroke-width: 1.7;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .our-services__media {
     transition: none;
+    perspective: none;
+  }
+
+  .our-services__media-index {
+    transform: none;
+    text-shadow: 0 0.05em 0.08em color-mix(in oklab, var(--ink) 14%, transparent);
   }
 
   .our-services__hit--filling .our-services__fill {
@@ -363,7 +388,7 @@
     clip-path: inset(0 0 0 0);
   }
 
-  .our-services__lattice--draw .our-services__stroke {
+  .our-services__stroke {
     stroke-dashoffset: 0;
     animation: none;
   }

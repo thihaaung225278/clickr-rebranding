@@ -27,7 +27,7 @@ export interface Corridor3DHandle {
 }
 
 /** Bump when paintCard chrome changes so React rebuilds textures. */
-export const CARD_TEXTURE_REV = 3;
+export const CARD_TEXTURE_REV = 4;
 
 
 const SPACING = 6.0;
@@ -258,8 +258,8 @@ function paintCard(
     ty += 24;
   });
 
-  // Caret pin under card
-  ctx.fillStyle = "#ffffff";
+  // Caret pin under card — solid brand fill (matches card accent / Clickr #FF6900)
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(W / 2 - 20, H - 24);
   ctx.lineTo(W / 2 + 20, H - 24);

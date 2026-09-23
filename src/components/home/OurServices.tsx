@@ -5,6 +5,11 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 /** Diamond point-to-point size in SVG viewBox units (larger 2+3 lattice). */
 const S = 100;
 const HALF = S / 2;
+/**
+ * Each lattice edge is a diamond half-diagonal × √2.
+ * 1.01 keeps square caps joined so the outline does not stop short.
+ */
+const STROKE_LEN = HALF * Math.SQRT2 * 1.01;
 /** 3 diamonds across bottom → width 3S; two rows → height 1.5S. */
 const VB_W = S * 3;
 const VB_H = S * 1.5;
@@ -282,7 +287,7 @@ export default function OurServices() {
                 >
                   <span className="our-services__media" aria-hidden="true">
                     <span className="our-services__fill" />
-                    <span className="our-services__media-index font-display">
+                    <span className="our-services__media-index font-display font-extrabold">
                       {index + 1}
                     </span>
                     <span className="our-services__media-label font-sans">
@@ -305,12 +310,12 @@ export default function OurServices() {
             preserveAspectRatio="xMidYMid meet"
             aria-hidden="true"
             focusable="false"
+            style={{ ["--stroke-len" as string]: STROKE_LEN }}
           >
             {LATTICE_PATHS.map((d, i) => (
               <path
                 key={i}
                 className="our-services__stroke"
-                pathLength={1}
                 d={d}
                 fill="none"
                 stroke="var(--brand)"

@@ -167,6 +167,7 @@ export default function TimelineCorridor({
   const webglRef = useRef<HTMLDivElement>(null);
   const corridorRef = useRef<HTMLElement>(null);
   const fpsRef = useRef<Corridor3DHandle | null>(null);
+  const listActiveRowRef = useRef<HTMLButtonElement | null>(null);
   const itemsKeyRef = useRef("");
   const wheelLock = useRef(false);
 
@@ -240,17 +241,6 @@ export default function TimelineCorridor({
     active && yearRange.max > yearRange.min
       ? (active.year - yearRange.min) / (yearRange.max - yearRange.min)
       : 0;
-
-  const stats = useMemo(() => {
-    if (!active) return { events: 0, kings: 0, queens: 0, milestones: 0 };
-    const upTo = filtered.filter((item) => item.year <= active.year);
-    return {
-      events: upTo.length,
-      kings: upTo.filter((item) => item.role === "king").length,
-      queens: upTo.filter((item) => item.role === "queen").length,
-      milestones: upTo.filter((item) => item.role === "milestone").length,
-    };
-  }, [filtered, active]);
 
   const isCompanyTimeline = useMemo(
     () =>
@@ -385,9 +375,17 @@ export default function TimelineCorridor({
     return () => document.removeEventListener("keydown", onEsc);
   }, [hoverTipId, panelOpen, aboutOpen, toolsOpen]);
 
+  // List view: keep the active row in the scrollport when scrubber/era/HUD changes index.
   useEffect(() => {
-    document.documentElement.style.setProperty("--accent", activeAccent);
-  }, [activeAccent]);
+    if (view !== "list") return;
+    const row = listActiveRowRef.current;
+    if (!row) return;
+    row.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
+  }, [activeIndex, view, reducedMotion, filtered.length]);
 
   const jumpToYear = (year: number) => {
     let best = 0;
@@ -459,12 +457,16 @@ export default function TimelineCorridor({
     <div
       className={`tl-root ${className}`.trim()}
       style={{ ["--accent" as string]: activeAccent } as CSSProperties}
-      aria-label={title ?? "Historical timeline"}
+      aria-label={title ?? "Company timeline"}
     >
-      <header className="tl-header">
-        <div className="tl-brand">
-          <span className="tl-brand-mark">{title ?? "Timeline"}</span>
-        </div>
+      <header
+        className={`tl-header${title ? "" : " tl-header--actions-only"}`.trim()}
+      >
+        {title ? (
+          <div className="tl-brand">
+            <span className="tl-brand-mark">{title}</span>
+          </div>
+        ) : null}
         <div className="tl-header-actions">
           <button type="button" onClick={() => setAboutOpen(true)}>
             About this timeline
@@ -575,39 +577,6 @@ export default function TimelineCorridor({
 
         {view === "corridor" ? (
           <>
-            <aside
-              className="hud hud-stats"
-              aria-live="polite"
-              aria-label={isCompanyTimeline ? "Company stats" : "Monarch stats"}
-            >
-              <div className="hud-stats-head">
-                {isCompanyTimeline ? "Company Stats" : "Monarch Stats"}
-              </div>
-              <dl className="hud-stats-list">
-                <div>
-                  <dt>{isCompanyTimeline ? "Milestones so far:" : "Number of Monarchs:"}</dt>
-                  <dd>{stats.events}</dd>
-                </div>
-                {isCompanyTimeline ? null : (
-                  <>
-                    <div>
-                      <dt>Number of Kings:</dt>
-                      <dd>{stats.kings}</dd>
-                    </div>
-                    <div>
-                      <dt>Number of Queens:</dt>
-                      <dd>{stats.queens}</dd>
-                    </div>
-                  </>
-                )}
-              </dl>
-              <p className="hud-stats-credit">
-                {isCompanyTimeline ? "Data: Clickr (placeholder)" : "Data: Wikipedia"}
-              </p>
-              <div className="hud-stats-year">
-                Year: <strong>{active?.year ?? "—"}</strong>
-              </div>
-            </aside>
             <button
               type="button"
               className="hud hud-nav hud-nav-prev"
@@ -648,6 +617,7 @@ export default function TimelineCorridor({
                 <li key={item.id}>
                   <button
                     type="button"
+                    ref={index === activeIndex ? listActiveRowRef : undefined}
                     className={index === activeIndex ? "is-active" : ""}
                     style={{ ["--card-accent" as string]: accent } as CSSProperties}
                     onClick={() => {
