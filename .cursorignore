@@ -1,0 +1,50 @@
+# Heavy / generated — keep Cursor index lean
+**/node_modules/
+**/bower_components/
+**/.git/
+**/.codegraph/
+**/.DS_Store
+**/.idea/
+**/.vscode/
+**/.npm-cache/
+**/.next/
+**/out/
+**/build/
+**/coverage/
+**/.turbo/
+**/.vercel/
+
+# Package compile output only — not **/lib/ (that would hide src/lib)
+/lib/
+
+.cursor/hooks/__pycache__/
+
+# Build / package outputs
+**/dist/
+**/release/
+**/temp/
+
+# Generated / minified / maps / logs
+**/*.min.js
+**/*.min.css
+**/*.map
+**/*.log
+**/npm-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Binary media & fonts (re-index when needed for a slice)
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.ico
+**/*.mp4
+**/*.pdf
+**/*.woff
+**/*.woff2
+**/*.ttf
+**/*.eot
+**/*.otf
+**/*.zip
