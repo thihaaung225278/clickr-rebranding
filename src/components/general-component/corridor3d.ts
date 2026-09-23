@@ -33,6 +33,8 @@ export const CARD_TEXTURE_REV = 4;
 const SPACING = 6.0;
 const CARD_W = 2.15;
 const CARD_H = 2.95;
+/** World Y of card bottom on the floor — scale grows/shrinks upward from here. */
+const CARD_FLOOR_Y = 1.68 - CARD_H / 2;
 const ROAD_HALF = 4.35;
 const LANE_COUNT = 3;
 /** World X for lanes L / C / R — separation > CARD_W so adjacent reigns clear. */
@@ -637,7 +639,11 @@ export function createCorridor3D(
         depthWrite: true,
       });
       const mesh = new THREE.Mesh(planeGeo, mat);
-      mesh.position.set(laneX(index), 1.68, worldZForIndex(index));
+      mesh.position.set(
+        laneX(index),
+        CARD_FLOOR_Y + CARD_H / 2,
+        worldZForIndex(index),
+      );
       mesh.userData = { index, id: item.id };
 
       cardRoot.add(mesh);
@@ -678,16 +684,20 @@ export function createCorridor3D(
 
       const z = -entry.index * space;
       const x = laneX(entry.index);
-      const y = 1.68;
-      entry.mesh.position.set(x, y, z);
 
-      const scale = d === 0 ? 1.06 : Math.max(0.62, 1 - Math.abs(d) * 0.045);
+      // Distance falloff × depthZoom; lift Y so bottom stays on the floor.
+      const distanceScale =
+        d === 0 ? 1.06 : Math.max(0.62, 1 - Math.abs(d) * 0.045);
+      const scale = distanceScale * depthZoom;
+      const y = CARD_FLOOR_Y + (CARD_H * scale) / 2;
+      entry.mesh.position.set(x, y, z);
       entry.mesh.scale.setScalar(scale);
 
       const opacity =
         d < 0 ? 0.38 : d === 0 ? 1 : Math.max(0.35, 1 - d * 0.07);
       entry.mesh.material.opacity = opacity;
 
+      // Same Y as card → yaw only (no pitch), so floor pin stays valid.
       entry.mesh.lookAt(camera.position.x, entry.mesh.position.y, camera.position.z);
 
       if (visible) ensureTexture(entry, items[entry.index]);

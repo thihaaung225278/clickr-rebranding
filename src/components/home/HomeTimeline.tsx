@@ -38,6 +38,7 @@ const TimelineCorridor = dynamic(
 export default function HomeTimeline() {
   return (
     <section
+      id="company-timeline"
       aria-labelledby="home-timeline-title"
       className="home-timeline bg-white"
     >

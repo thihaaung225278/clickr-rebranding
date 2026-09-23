@@ -241,6 +241,7 @@ export default function OurServices() {
 
   return (
     <section
+      id="our-services"
       ref={sectionRef}
       aria-labelledby="our-services-title"
       className={`our-services${inView ? " our-services--in-view" : ""}`}

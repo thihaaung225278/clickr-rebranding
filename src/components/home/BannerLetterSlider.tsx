@@ -224,6 +224,7 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
 
   return (
     <section
+      id="home"
       aria-labelledby="home-brand"
       className="banner-slider relative isolate flex min-h-dvh flex-col overflow-x-hidden"
       style={{ ["--fill-ms" as string]: `${AUTO_MS}ms` }}

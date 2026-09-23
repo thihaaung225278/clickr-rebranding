@@ -8,6 +8,7 @@ const TALK_HREF = "https://www.clickrmedia.com/growth-engine/#talk-to-us";
 export default function HomeLetsTalk() {
   return (
     <section
+      id="lets-talk"
       aria-labelledby="home-lets-talk-title"
       className="bg-[var(--surface)]"
     >

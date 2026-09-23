@@ -521,7 +521,8 @@ export default function TimelineCorridor({
                 const z = -distance * DEPTH_STEP * depthZoom;
                 const y = distance * (Y_STEP + 10);
                 const x = LANE_X_PX[((index % LANE_COUNT) + LANE_COUNT) % LANE_COUNT];
-                const scale = Math.max(0.42, 1 - Math.abs(distance) * 0.09);
+                const scale =
+                  Math.max(0.42, 1 - Math.abs(distance) * 0.09) * depthZoom;
                 const opacity =
                   distance < 0
                     ? Math.max(0.2, 0.45 + distance * 0.08)

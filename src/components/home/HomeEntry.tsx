@@ -5,6 +5,7 @@ import BrandCursor from "./BrandCursor";
 import HandStrokeIntro from "./HandStrokeIntro";
 import HomeHero from "./HomeHero";
 import HomeLetsTalk from "./HomeLetsTalk";
+import HomeMenu from "./HomeMenu";
 import HomeTimeline from "./HomeTimeline";
 import OurServices from "./OurServices";
 
@@ -18,6 +19,7 @@ export default function HomeEntry() {
   return (
     <HandStrokeIntro onReady={handleReady}>
       <BrandCursor active={armed} />
+      <HomeMenu />
       <main className="flex flex-1 flex-col bg-[var(--surface)] text-[var(--ink)]">
         <HomeHero armed={armed} />
         <OurServices />

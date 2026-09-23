@@ -235,6 +235,8 @@
   left: 50%;
   top: 42%;
   width: min(18rem, 72vw);
+  /* Scale from bottom so zoom grows/shrinks upward (matches WebGL floor pin). */
+  transform-origin: bottom center;
   transform-style: preserve-3d;
   transition:
     transform var(--duration) var(--ease),
