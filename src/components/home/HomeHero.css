@@ -44,72 +44,6 @@
   user-select: none;
 }
 
-/* Mouse-follow cursor: arrow tip + brand "c" (fine pointer only; JS toggles) */
-.banner-slider__cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 60;
-  margin: 0;
-  padding: 0;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate3d(-100px, -100px, 0);
-  will-change: transform;
-  transition: opacity 0.18s ease;
-}
-
-.banner-slider__cursor--on {
-  opacity: 1;
-}
-
-.banner-slider__cursor-inner {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.12rem;
-  /* Tip of arrow sits on the pointer hotspot */
-  transform: translate(0, 0);
-}
-
-.banner-slider__cursor-arrow {
-  flex-shrink: 0;
-  display: block;
-  width: 1.125rem;
-  height: 1.125rem;
-  color: var(--brand);
-  /* Keep familiar OS slant — color only changes to brand */
-  transform: rotate(-8deg);
-  filter: drop-shadow(0 0.5px 0 color-mix(in oklab, var(--ink) 22%, transparent));
-}
-
-.banner-slider__cursor-arrow svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.banner-slider__cursor-letter {
-  margin-top: 0.28rem;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  /* Outline only — no fill */
-  color: transparent;
-  -webkit-text-stroke: 0.055em var(--brand);
-  paint-order: stroke fill;
-  font-size: 2.15rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.banner-slider--custom-cursor,
-.banner-slider--custom-cursor * {
-  cursor: none !important;
-}
-
 /* Stroke shell — always visible underneath */
 .banner-slider__glyph-outline {
   color: transparent;
@@ -356,9 +290,5 @@
   .banner-slider__glyph--filling .banner-slider__glyph-liquid {
     animation: none;
     clip-path: inset(0 0 0 0);
-  }
-
-  .banner-slider__cursor {
-    display: none;
   }
 }

@@ -113,16 +113,13 @@ function BannerLede({
  * `armed` gates autoplay until the home intro overlay finishes.
  */
 export default function BannerLetterSlider({ armed }: { armed: boolean }) {
-  const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const stageWrapRef = useRef<HTMLDivElement>(null);
-  const cursorRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<Letter3DHandle | null>(null);
   const viewportKeyRef = useRef("");
   const pendingStageRelockRef = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [webglOk, setWebglOk] = useState(true);
-  const [cursorOn, setCursorOn] = useState(false);
   const [stageLockPx, setStageLockPx] = useState<number | null>(null);
   const [ledeExpanded, setLedeExpanded] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
@@ -210,34 +207,6 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
     return () => window.clearTimeout(id);
   }, [activeIndex, reducedMotion, armed]);
 
-  // Fine-pointer custom cursor: arrow tip + brand "c" (DOM transform, no re-render per move).
-  useEffect(() => {
-    if (reducedMotion || !armed) return;
-    const section = sectionRef.current;
-    const cursor = cursorRef.current;
-    if (!section || !cursor) return;
-
-    const fineMq = window.matchMedia("(pointer: fine)");
-    if (!fineMq.matches) return;
-
-    const onMove = (event: PointerEvent) => {
-      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
-    };
-    const onEnter = () => setCursorOn(true);
-    const onLeave = () => setCursorOn(false);
-
-    section.addEventListener("pointermove", onMove);
-    section.addEventListener("pointerenter", onEnter);
-    section.addEventListener("pointerleave", onLeave);
-
-    return () => {
-      section.removeEventListener("pointermove", onMove);
-      section.removeEventListener("pointerenter", onEnter);
-      section.removeEventListener("pointerleave", onLeave);
-      setCursorOn(false);
-    };
-  }, [reducedMotion, armed]);
-
   const advance = () => {
     if (!armed) return;
     setActiveIndex((i) => (i + 1) % LETTERS.length);
@@ -255,37 +224,11 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
 
   return (
     <section
-      ref={sectionRef}
       aria-labelledby="home-brand"
-      className={`banner-slider relative isolate flex min-h-dvh flex-col overflow-x-hidden${cursorOn ? " banner-slider--custom-cursor" : ""}`}
+      className="banner-slider relative isolate flex min-h-dvh flex-col overflow-x-hidden"
       style={{ ["--fill-ms" as string]: `${AUTO_MS}ms` }}
     >
       <div className="banner-slider__atmosphere" aria-hidden="true" />
-
-      <div
-        ref={cursorRef}
-        className={`banner-slider__cursor${cursorOn ? " banner-slider__cursor--on" : ""}`}
-        aria-hidden="true"
-      >
-        <div className="banner-slider__cursor-inner">
-          <span className="banner-slider__cursor-arrow">
-            <svg
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              aria-hidden="true"
-              focusable="false"
-            >
-              {/* Classic OS pointer path — tip at top-left, slight natural slant */}
-              <path
-                fill="currentColor"
-                d="M4.5 2.2v17.1c0 .48.58.72.92.38l4.05-4.05c.1-.1.23-.15.36-.15h6.4c.48 0 .72-.58.38-.92L5.35 1.84A.5.5 0 0 0 4.5 2.2Z"
-              />
-            </svg>
-          </span>
-          <span className="banner-slider__cursor-letter font-display">c</span>
-        </div>
-      </div>
 
       <div className="banner-slider__frame relative z-10 flex min-h-0 flex-1">
         <nav

@@ -1,0 +1,68 @@
+/* Site-wide brand cursor — arrow tip + outline "c" (fine pointer; JS toggles). */
+
+.brand-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  will-change: transform;
+  transition: opacity 0.18s ease;
+}
+
+.brand-cursor--on {
+  opacity: 1;
+}
+
+.brand-cursor__inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.12rem;
+}
+
+.brand-cursor__arrow {
+  flex-shrink: 0;
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--brand);
+  transform: rotate(-8deg);
+  filter: drop-shadow(0 0.5px 0 color-mix(in oklab, var(--ink) 22%, transparent));
+}
+
+.brand-cursor__arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-cursor__letter {
+  margin-top: 0.28rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: transparent;
+  -webkit-text-stroke: 0.055em var(--brand);
+  paint-order: stroke fill;
+  font-size: 2.15rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+html.brand-cursor-active,
+html.brand-cursor-active * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-cursor {
+    display: none;
+  }
+}

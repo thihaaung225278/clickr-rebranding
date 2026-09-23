@@ -1,0 +1,354 @@
+/* Our Services — 5 large white diamonds + brand stroke draw + hover water-fill + popup. */
+
+.our-services {
+  position: relative;
+  width: 100%;
+  padding: clamp(3.5rem, 8vh, 5.5rem) 0 clamp(4.5rem, 11vh, 7rem);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.our-services__inner {
+  width: min(78rem, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 3rem);
+}
+
+.our-services__title {
+  margin: 0 0 clamp(1.75rem, 4vw, 2.75rem);
+  text-align: center;
+}
+
+.our-services__stage {
+  position: relative;
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+  /* viewBox 3 × 1.5 → keep proportion; taller on-page = larger diamonds */
+  aspect-ratio: 2 / 1;
+}
+
+.our-services__cells {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.our-services__cell {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+}
+
+.our-services__hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  appearance: none;
+}
+
+.our-services__hit:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.our-services__media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  color: var(--ink);
+  transition: color 0.25s ease;
+}
+
+/* Soft brand tint — rises like water when --filling is armed (not :hover). */
+.our-services__fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: color-mix(in oklab, var(--brand) 26%, transparent);
+  clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+}
+
+.our-services__hit--filling .our-services__fill {
+  animation: our-services-water-fill 0.55s ease-out forwards;
+}
+
+.our-services__hit--filling .our-services__media-label {
+  color: var(--brand);
+}
+
+.our-services__media-index {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(1.35rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--brand);
+}
+
+.our-services__media-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.12em;
+  max-width: 78%;
+  font-size: clamp(0.72rem, 1.7vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.our-services__media-line {
+  display: block;
+}
+
+.our-services__lattice {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.our-services__stroke {
+  stroke: var(--brand);
+  stroke-width: 2.25;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.our-services__lattice--draw .our-services__stroke {
+  animation: our-services-stroke-draw 1.05s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: calc(var(--stroke-i, 0) * 32ms);
+}
+
+.our-services__lattice--instant .our-services__stroke {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+@keyframes our-services-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/*
+ * Water fill: rising level + undulating surface (polygon wave).
+ * Same idea as banner-water-fill; shorter for hover feedback.
+ */
+@keyframes our-services-water-fill {
+  0% {
+    clip-path: polygon(
+      0% 102%,
+      20% 100%,
+      40% 102%,
+      60% 100%,
+      80% 102%,
+      100% 100%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  25% {
+    clip-path: polygon(
+      0% 72%,
+      18% 68%,
+      38% 74%,
+      58% 69%,
+      78% 73%,
+      100% 70%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  50% {
+    clip-path: polygon(
+      0% 42%,
+      22% 46%,
+      42% 38%,
+      62% 44%,
+      82% 39%,
+      100% 43%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  75% {
+    clip-path: polygon(
+      0% 18%,
+      20% 14%,
+      40% 20%,
+      60% 15%,
+      80% 19%,
+      100% 16%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  100% {
+    clip-path: polygon(
+      0% -2%,
+      20% 1%,
+      40% -2%,
+      60% 1%,
+      80% -2%,
+      100% 0%,
+      100% 100%,
+      0% 100%
+    );
+  }
+}
+
+/* Popup — white + brand stroke */
+.our-services__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: color-mix(in oklab, var(--ink) 42%, transparent);
+}
+
+.our-services__dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(34rem, 100%);
+  max-height: min(85dvh, 40rem);
+  padding: 1.45rem 1.5rem 1.6rem;
+  background: #ffffff;
+  color: var(--ink);
+  border: 2px solid var(--brand);
+  box-shadow: 0 18px 48px color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+.our-services__dialog-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.our-services__dialog-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.our-services__dialog-close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.our-services__dialog-close:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.our-services__dialog-close:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.our-services__dialog-scroll {
+  margin-top: 0.85rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.our-services__dialog-body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.our-services__dialog-list {
+  margin: 1rem 0 0;
+  padding: 0 0 0 1.15rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.our-services__dialog-list li {
+  margin: 0.35rem 0;
+}
+
+.our-services__dialog-list li::marker {
+  color: var(--brand);
+}
+
+@media (max-width: 40rem) {
+  .our-services__stage {
+    max-width: none;
+    aspect-ratio: 1.55 / 1;
+  }
+
+  .our-services__media-label {
+    letter-spacing: 0.04em;
+    font-size: clamp(0.62rem, 2.8vw, 0.85rem);
+  }
+
+  .our-services__stroke {
+    stroke-width: 1.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .our-services__media {
+    transition: none;
+  }
+
+  .our-services__hit--filling .our-services__fill {
+    animation: none;
+    clip-path: inset(0 0 0 0);
+  }
+
+  .our-services__lattice--draw .our-services__stroke {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
