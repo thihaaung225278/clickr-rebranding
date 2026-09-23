@@ -6,7 +6,7 @@ import {
   type Letter3DHandle,
 } from "./letter3d";
 
-	const LETTERS = ["C", "l", "i", "c", "k", "r"] as const;
+const LETTERS = ["C", "l", "i", "c", "k", "r"] as const;
 /** Slide + water-fill duration (ms). Fill completes, then advance. */
 const AUTO_MS = 2000;
 
@@ -38,10 +38,13 @@ function usePrefersReducedMotion(): boolean {
  * Home banner: left vertical Clickr auto-active rail + right 3D letter stage.
  */
 export default function BannerLetterSlider() {
+  const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<Letter3DHandle | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [webglOk, setWebglOk] = useState(true);
+  const [cursorOn, setCursorOn] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -86,6 +89,34 @@ export default function BannerLetterSlider() {
     return () => window.clearTimeout(id);
   }, [activeIndex, reducedMotion]);
 
+  // Fine-pointer custom cursor: arrow tip + brand "c" (DOM transform, no re-render per move).
+  useEffect(() => {
+    if (reducedMotion) return;
+    const section = sectionRef.current;
+    const cursor = cursorRef.current;
+    if (!section || !cursor) return;
+
+    const fineMq = window.matchMedia("(pointer: fine)");
+    if (!fineMq.matches) return;
+
+    const onMove = (event: PointerEvent) => {
+      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+    };
+    const onEnter = () => setCursorOn(true);
+    const onLeave = () => setCursorOn(false);
+
+    section.addEventListener("pointermove", onMove);
+    section.addEventListener("pointerenter", onEnter);
+    section.addEventListener("pointerleave", onLeave);
+
+    return () => {
+      section.removeEventListener("pointermove", onMove);
+      section.removeEventListener("pointerenter", onEnter);
+      section.removeEventListener("pointerleave", onLeave);
+      setCursorOn(false);
+    };
+  }, [reducedMotion]);
+
   const advance = () => {
     setActiveIndex((i) => (i + 1) % LETTERS.length);
   };
@@ -94,21 +125,48 @@ export default function BannerLetterSlider() {
 
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="home-brand"
-      className="banner-slider relative isolate flex h-dvh flex-col overflow-hidden"
+      className={`banner-slider relative isolate flex h-dvh flex-col overflow-hidden${cursorOn ? " banner-slider--custom-cursor" : ""}`}
       style={{ ["--fill-ms" as string]: `${AUTO_MS}ms` }}
     >
       <div className="banner-slider__atmosphere" aria-hidden="true" />
 
+      <div
+        ref={cursorRef}
+        className={`banner-slider__cursor${cursorOn ? " banner-slider__cursor--on" : ""}`}
+        aria-hidden="true"
+      >
+        <div className="banner-slider__cursor-inner">
+          <span className="banner-slider__cursor-arrow">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              aria-hidden="true"
+              focusable="false"
+            >
+              {/* Classic OS pointer path — tip at top-left, slight natural slant */}
+              <path
+                fill="currentColor"
+                d="M4.5 2.2v17.1c0 .48.58.72.92.38l4.05-4.05c.1-.1.23-.15.36-.15h6.4c.48 0 .72-.58.38-.92L5.35 1.84A.5.5 0 0 0 4.5 2.2Z"
+              />
+            </svg>
+          </span>
+          <span className="banner-slider__cursor-letter font-display">c</span>
+        </div>
+      </div>
+
       <div className="banner-slider__frame relative z-10 flex min-h-0 flex-1">
         <nav
           aria-label="Clickr letter sequence"
-          className="banner-slider__rail flex w-1/4 shrink-0 flex-col items-center justify-center gap-[clamp(0.3rem,1.2vh,0.85rem)] overflow-hidden border-r border-[color-mix(in_oklab,var(--ink)_12%,transparent)] py-6"
+          className="banner-slider__rail flex w-1/4 shrink-0 flex-col items-center justify-center gap-[clamp(0.2rem,0.9vh,0.65rem)] overflow-hidden border-r border-[color-mix(in_oklab,var(--ink)_12%,transparent)] py-5"
         >
           {LETTERS.map((letter, index) => {
             const phase = glyphPhase(index, activeIndex);
+            const isActive = phase === "filling";
             const phaseClass =
-              phase === "filling"
+              isActive
                 ? reducedMotion
                   ? "banner-slider__glyph--done"
                   : "banner-slider__glyph--filling"
@@ -120,8 +178,8 @@ export default function BannerLetterSlider() {
               <button
                 key={`${letter}-${index}`}
                 type="button"
-                className={`banner-slider__glyph font-display text-[clamp(3.25rem,7vw,5.5rem)] font-bold leading-none tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)] ${phaseClass}`}
-                aria-current={phase === "filling" ? "true" : undefined}
+                className={`banner-slider__glyph font-display text-[clamp(2.75rem,6.2vw,4.75rem)] font-bold leading-none tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)] ${phaseClass}`}
+                aria-current={isActive ? "true" : undefined}
                 aria-label={`Letter ${letter}`}
                 onClick={() => setActiveIndex(index)}
               >
@@ -130,14 +188,14 @@ export default function BannerLetterSlider() {
                 </span>
                 <span
                   key={
-                    phase === "filling" && !reducedMotion
+                    isActive && !reducedMotion
                       ? `fill-${activeIndex}`
                       : undefined
                   }
                   className="banner-slider__glyph-liquid"
                   aria-hidden="true"
                   onAnimationEnd={
-                    phase === "filling" && !reducedMotion
+                    isActive && !reducedMotion
                       ? (e) => {
                           if (e.animationName !== "banner-water-fill") return;
                           advance();
