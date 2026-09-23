@@ -41,6 +41,22 @@
   position: absolute;
   margin: 0;
   padding: 0;
+  /* Bottom row default — below top row so nestled hits reach upper diamonds */
+  z-index: 1;
+}
+
+/* Top row always above bottom row (fixes bottom→top hover steal). */
+.our-services__cell--top {
+  z-index: 3;
+}
+
+/* Elevate active fill within its row — bottom stays under top row. */
+.our-services__cell:has(.our-services__hit--filling) {
+  z-index: 2;
+}
+
+.our-services__cell--top:has(.our-services__hit--filling) {
+  z-index: 4;
 }
 
 .our-services__hit {

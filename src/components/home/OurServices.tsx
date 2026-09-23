@@ -253,7 +253,7 @@ export default function OurServices() {
             {SERVICES.map((item, index) => (
               <li
                 key={item.id}
-                className="our-services__cell"
+                className={`our-services__cell${item.cy === HALF ? " our-services__cell--top" : ""}`}
                 style={{
                   left: `${((item.cx - HALF) / VB_W) * 100}%`,
                   top: `${((item.cy - HALF) / VB_H) * 100}%`,
