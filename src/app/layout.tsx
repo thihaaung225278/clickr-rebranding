@@ -1,29 +1,37 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, Figtree } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+/** Display / headings — matches clickrmedia.com hero (Figtree 800). */
+const display = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
+  weight: ["600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+/** Body / CTA — matches clickrmedia.com UI (DM Sans). */
+const sans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Clickr",
-  description: "Clickr rebranding site",
+  title: {
+    default: "Clickr",
+    template: "%s · Clickr",
+  },
+  description:
+    "Clickr — media that moves brands forward. Explore the company timeline from 2009 to today.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="flex min-h-full flex-col font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>
