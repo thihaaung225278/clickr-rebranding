@@ -303,7 +303,7 @@ function makeYearTexture(year: number) {
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) throw new Error("2D canvas unavailable");
   ctx.clearRect(0, 0, 320, 140);
-  ctx.fillStyle = "rgba(40,40,40,0.55)";
+  ctx.fillStyle = "rgba(255,105,0,0.72)";
   ctx.font = "bold 86px Segoe UI, Helvetica Neue, Arial, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -311,6 +311,48 @@ function makeYearTexture(year: number) {
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
+}
+
+const BRAND = 0xff6900;
+
+/**
+ * Even brand dot grid — same idea as banner `letter3d.buildDotField`.
+ * Screen-space size (no attenuation) so dots stay visible across corridor depth.
+ */
+function buildCorridorDotField(): {
+  points: THREE.Points;
+  geometry: THREE.BufferGeometry;
+  material: THREE.PointsMaterial;
+} {
+  const cols = 36;
+  const rows = 22;
+  const spacing = 1.35;
+  const positions: number[] = [];
+  const x0 = -((cols - 1) * spacing) / 2;
+  const y0 = -((rows - 1) * spacing) / 2;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      positions.push(x0 + col * spacing, y0 + row * spacing, 0);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  const material = new THREE.PointsMaterial({
+    color: BRAND,
+    size: 3.5,
+    sizeAttenuation: false,
+    transparent: true,
+    opacity: 0.42,
+    depthWrite: false,
+    fog: false,
+  });
+  const points = new THREE.Points(geometry, material);
+  points.renderOrder = -20;
+  points.frustumCulled = false;
+  return { points, geometry, material };
 }
 
 export function createCorridor3D(
@@ -346,6 +388,11 @@ export function createCorridor3D(
   const fill = new THREE.PointLight(0xffffff, 0.32, 55, 2);
   fill.position.set(0, 2.2, -6);
   scene.add(fill);
+
+  // Banner-style even brand dots behind the corridor (fill the white void).
+  const dotField = buildCorridorDotField();
+  const dots = dotField.points;
+  scene.add(dots);
 
   // White floor — BasicMaterial so lights don't tint it gray
   const roadMat = new THREE.MeshBasicMaterial({
@@ -694,6 +741,9 @@ export function createCorridor3D(
     camera.position.x = 0;
     camera.lookAt(0, 0.75, camZ - 26);
     fill.position.z = camZ - 6;
+    // Keep the even dot plane behind cards (no drift / no spin).
+    // Closer than before so the grid fills the white void like the banner stage.
+    dots.position.set(0, 5.5, camZ - 18);
     cards.forEach((entry) => {
       if (!entry.mesh.visible) return;
       entry.mesh.lookAt(camera.position.x, entry.mesh.position.y, camera.position.z);
@@ -731,6 +781,9 @@ export function createCorridor3D(
       renderer.domElement.removeEventListener("click", onPointer);
       clearCards();
       clearRuler();
+      scene.remove(dots);
+      dotField.geometry.dispose();
+      dotField.material.dispose();
       planeGeo.dispose();
       yearGeo.dispose();
       road.geometry.dispose();

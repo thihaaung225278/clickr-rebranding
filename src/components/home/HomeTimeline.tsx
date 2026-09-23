@@ -11,6 +11,7 @@ import {
 /**
  * Home company timeline — same corridor as `/timeline`.
  * Section title matches Our Services scale; light surface (no black shell).
+ * Brand atmosphere lives in the WebGL corridor backdrop (not the title band).
  * `ssr: false` must live in a Client Component (Next 16).
  */
 
