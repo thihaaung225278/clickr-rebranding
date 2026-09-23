@@ -6,7 +6,7 @@ import {
   type Letter3DHandle,
 } from "./letter3d";
 
-const LETTERS = ["C", "l", "i", "c", "k", "r"] as const;
+const LETTERS = ["C", "L", "i", "c", "k", "r"] as const;
 /** Slide + water-fill duration (ms). Fill completes, then advance. */
 const AUTO_MS = 2000;
 

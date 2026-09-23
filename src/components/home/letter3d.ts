@@ -12,9 +12,9 @@ const STAGE_WHITE = 0xffffff;
 const FONT_URL = "/fonts/helvetiker_bold.typeface.json";
 
 /** Single even grid behind the letter — one plane, no drift (avoids dizzy stacking). */
-const DOT_COLS = 18;
-const DOT_ROWS = 13;
-const DOT_SPACING = 0.7;
+const DOT_COLS = 16;
+const DOT_ROWS = 12;
+const DOT_SPACING = 0.65;
 const DOT_Z = -2.4;
 
 export interface Letter3DHandle {
@@ -75,8 +75,9 @@ export function createLetter3D(
   scene.background = new THREE.Color(STAGE_WHITE);
   scene.fog = null;
 
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 40);
-  camera.position.set(0, 0.15, 4.2);
+  // Slightly tighter FOV + farther cam so the glyph breathes inside the stage.
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40);
+  camera.position.set(0, 0, 4.85);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -136,7 +137,7 @@ export function createLetter3D(
 
     const geometry = new TextGeometry(glyph, {
       font,
-      size: 2.35,
+      size: 1.85,
       depth: 0.42,
       curveSegments: 10,
       bevelEnabled: true,
