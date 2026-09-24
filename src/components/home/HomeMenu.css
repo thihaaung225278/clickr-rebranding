@@ -32,6 +32,40 @@
     border-color 0.2s ease;
 }
 
+.home-menu__logo {
+  pointer-events: auto;
+  position: absolute;
+  top: clamp(1rem, 3vw, 1.75rem);
+  left: clamp(1rem, 3vw, 1.75rem);
+  z-index: 2;
+  box-sizing: border-box;
+  display: block;
+  width: clamp(6.5rem, 18vw, 8.75rem);
+  height: auto;
+  margin: 0;
+  padding: 0.2rem 0;
+  line-height: 0;
+  text-decoration: none;
+  border-radius: 0;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.home-menu__logo:hover {
+  opacity: 0.85;
+}
+
+.home-menu__logo:focus-visible {
+  outline: 2px solid var(--brand, #ff6900);
+  outline-offset: 4px;
+}
+
+.home-menu__logo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .home-menu__toggle:hover {
   background-color: var(--brand, #ff6900);
   color: #fff;
@@ -236,6 +270,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-menu__logo,
   .home-menu__toggle,
   .home-menu__burger-line,
   .home-menu__panel,

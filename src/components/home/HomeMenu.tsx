@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import "./HomeMenu.css";
 
@@ -9,6 +10,13 @@ const LINKS = [
   { href: "#company-timeline", label: "Company Timeline", index: "03" },
   { href: "#lets-talk", label: "Let's talk", index: "04" },
 ] as const;
+
+/** Optimized wordmark — 560×156 source; chrome displays ~140×39. */
+const WORDMARK = {
+  src: "/brand/clickr-wordmark.webp",
+  width: 560,
+  height: 156,
+} as const;
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -23,7 +31,7 @@ function usePrefersReducedMotion(): boolean {
 }
 
 /**
- * Home-only floating hamburger + brand overlay panel.
+ * Home-only floating wordmark + hamburger + brand overlay panel.
  * Mount under HandStrokeIntro so intro inert/z-index still wins.
  */
 export default function HomeMenu() {
@@ -31,6 +39,7 @@ export default function HomeMenu() {
   const reducedMotion = usePrefersReducedMotion();
   const panelId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const openRef = useRef(open);
   openRef.current = open;
@@ -87,9 +96,11 @@ export default function HomeMenu() {
             sheetRef.current.querySelectorAll<HTMLElement>("a[href]"),
           )
         : [];
-      const nodes = [toggleRef.current, ...sheetLinks].filter(
-        (node): node is HTMLElement => Boolean(node),
-      );
+      const nodes = [
+        logoRef.current,
+        toggleRef.current,
+        ...sheetLinks,
+      ].filter((node): node is HTMLElement => Boolean(node));
       if (nodes.length === 0) return;
 
       const first = nodes[0];
@@ -129,6 +140,26 @@ export default function HomeMenu() {
 
   return (
     <div className={`home-menu${open ? " home-menu--open" : ""}`}>
+      <a
+        ref={logoRef}
+        href="#home"
+        className="home-menu__logo"
+        aria-label="Clickr home"
+        onClick={(event) => {
+          event.preventDefault();
+          goTo("#home");
+        }}
+      >
+        <Image
+          src={WORDMARK.src}
+          alt=""
+          width={WORDMARK.width}
+          height={WORDMARK.height}
+          className="home-menu__logo-img"
+          priority
+        />
+      </a>
+
       <button
         ref={toggleRef}
         type="button"
