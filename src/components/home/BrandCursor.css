@@ -1,4 +1,4 @@
-/* Site-wide brand cursor — arrow tip + outline "c" (fine pointer; JS toggles). */
+/* Site-wide brand cursor — arrow tip (fine pointer; JS toggles). */
 
 .brand-cursor {
   position: fixed;
@@ -31,29 +31,18 @@
   height: 1.125rem;
   color: var(--brand);
   transform: rotate(-8deg);
-  filter: drop-shadow(0 0.5px 0 color-mix(in oklab, var(--ink) 22%, transparent));
+  /* Dual-edge: white outer + ink so brand fill reads on brand and white surfaces */
+  filter:
+    drop-shadow(0 0 0.65px #ffffff)
+    drop-shadow(0 0 1.15px #ffffff)
+    drop-shadow(0 0.55px 0 color-mix(in oklab, var(--ink) 45%, transparent));
 }
 
 .brand-cursor__arrow svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.brand-cursor__letter {
-  margin-top: 0.28rem;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  color: transparent;
-  -webkit-text-stroke: 0.055em var(--brand);
-  paint-order: stroke fill;
-  font-size: 2.15rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  overflow: visible;
 }
 
 html.brand-cursor-active,

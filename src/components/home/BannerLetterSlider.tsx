@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createLetter3D,
@@ -9,6 +10,13 @@ import {
 const LETTERS = ["C", "L", "i", "c", "k", "r"] as const;
 /** Slide + water-fill duration (ms). Fill completes, then advance. */
 const AUTO_MS = 2000;
+
+/** Optimized wordmark — 560×156 source; rail displays ~140×39. */
+const WORDMARK = {
+  src: "/brand/clickr-wordmark.webp",
+  width: 560,
+  height: 156,
+} as const;
 
 /** Live brand CTAs (clickrmedia.com hero). */
 const CTA_HOW_IT_WORKS = "https://www.clickrmedia.com/growth-engine/";
@@ -234,8 +242,23 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
       <div className="banner-slider__frame relative z-10 flex min-h-0 flex-1">
         <nav
           aria-label="Clickr letter sequence"
-          className="banner-slider__rail flex w-1/4 shrink-0 flex-col items-center justify-center gap-[clamp(0.2rem,0.9vh,0.65rem)] overflow-hidden border-r border-[color-mix(in_oklab,var(--ink)_12%,transparent)] py-5"
+          className="banner-slider__rail flex w-1/4 shrink-0 flex-col overflow-hidden"
         >
+          <a
+            href="#home"
+            className="banner-slider__logo"
+            aria-label="Clickr home"
+          >
+            <Image
+              src={WORDMARK.src}
+              alt=""
+              width={WORDMARK.width}
+              height={WORDMARK.height}
+              className="banner-slider__logo-img"
+              priority
+            />
+          </a>
+          <div className="banner-slider__glyphs flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.2rem,0.9vh,0.65rem)] py-5">
           {LETTERS.map((letter, index) => {
             const phase = armed ? glyphPhase(index, activeIndex) : "pending";
             const isActive = phase === "filling";
@@ -285,6 +308,7 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
               </button>
             );
           })}
+          </div>
         </nav>
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">

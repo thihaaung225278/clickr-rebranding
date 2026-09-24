@@ -16,12 +16,63 @@
 
 /* Left letter rail — thin brand wash into white (does not tint the WebGL stage). */
 .banner-slider__rail {
+  border-right: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
   background: linear-gradient(
     90deg,
     color-mix(in oklab, var(--brand) 16%, #ffffff) 0%,
     color-mix(in oklab, var(--brand) 5%, #ffffff) 45%,
     #ffffff 80%
   );
+}
+
+/* Wordmark sits in the rail (scrolls with banner — not fixed chrome). */
+.banner-slider__logo {
+  box-sizing: border-box;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(clamp(1rem, 3vw, 1.75rem) * 2 + 3.25rem);
+  margin: 0;
+  padding:
+    clamp(1rem, 3vw, 1.75rem)
+    clamp(0.5rem, 1.5vw, 1rem);
+  line-height: 0;
+  text-decoration: none;
+  border: 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  background: transparent;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.banner-slider__logo:hover {
+  opacity: 0.9;
+}
+
+.banner-slider__logo:focus-visible {
+  outline: 2px solid var(--brand, #ff6900);
+  outline-offset: -2px;
+}
+
+.banner-slider__logo-img {
+  display: block;
+  width: clamp(5.5rem, 55%, 8.25rem);
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 40rem) {
+  .banner-slider__logo-img {
+    width: clamp(4.75rem, 70%, 7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-slider__logo {
+    transition: none;
+  }
 }
 
 .banner-slider__glyph {
@@ -186,7 +237,8 @@
   margin: 0;
   padding: 0;
   border: 2px solid currentColor;
-  border-radius: 0;
+  border-radius: 50%;
+  overflow: hidden;
   color: var(--brand, #ff6900);
   cursor: pointer;
   transform: translateY(-50%);

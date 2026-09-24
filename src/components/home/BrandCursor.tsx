@@ -15,7 +15,7 @@ function usePrefersReducedMotion(): boolean {
 }
 
 /**
- * Site-wide brand cursor (arrow tip + outline "c") — same design as the home banner.
+ * Site-wide brand cursor (arrow tip only) — same brand fill as the home banner.
  * Fine pointer only; respects prefers-reduced-motion; gated by `active` (e.g. after intro).
  */
 export default function BrandCursor({ active }: { active: boolean }) {
@@ -70,14 +70,17 @@ export default function BrandCursor({ active }: { active: boolean }) {
             aria-hidden="true"
             focusable="false"
           >
-            {/* Classic OS pointer path — tip at top-left, slight natural slant */}
+            {/* Classic OS pointer — white stroke behind brand fill for brand-on-brand contrast */}
             <path
               fill="currentColor"
+              stroke="#ffffff"
+              strokeWidth="1.75"
+              strokeLinejoin="round"
+              paintOrder="stroke fill"
               d="M4.5 2.2v17.1c0 .48.58.72.92.38l4.05-4.05c.1-.1.23-.15.36-.15h6.4c.48 0 .72-.58.38-.92L5.35 1.84A.5.5 0 0 0 4.5 2.2Z"
             />
           </svg>
         </span>
-        <span className="brand-cursor__letter font-display">c</span>
       </div>
     </div>
   );
