@@ -170,8 +170,12 @@ export default function TimelineCorridor({
   const listActiveRowRef = useRef<HTMLButtonElement | null>(null);
   const itemsKeyRef = useRef("");
   const wheelLock = useRef(false);
+  const activeIndexRef = useRef(0);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
   const [query, setQuery] = useState("");
   const [searchDraft, setSearchDraft] = useState("");
   const [view, setView] = useState<CorridorView>("corridor");
@@ -317,15 +321,31 @@ export default function TimelineCorridor({
   }, [fpsItems, activeIndex, depthZoom, view, useWebGL]);
 
   // Wheel + keyboard on corridor / webgl stage.
+  // Keep the page still until every card has been stepped. Release only
+  // at the last card (scroll down) or the first card (scroll up).
+  // Lock ticks and sub-threshold deltas still preventDefault so a trackpad
+  // fling cannot advance the document mid-timeline.
   useEffect(() => {
     if (view !== "corridor" || filtered.length === 0) return;
 
+    const lastIndex = filtered.length - 1;
+
     const onWheel = (event: WheelEvent) => {
-      if (panelOpen) return;
+      if (event.deltaY === 0) return;
+
+      const direction: 1 | -1 = event.deltaY > 0 ? 1 : -1;
+      const index = activeIndexRef.current;
+      const releasePage =
+        (direction === 1 && index >= lastIndex) ||
+        (direction === -1 && index <= 0);
+      if (releasePage) return;
+
       event.preventDefault();
+      if (panelOpen) return;
       if (Math.abs(event.deltaY) < 8 || wheelLock.current) return;
+
       wheelLock.current = true;
-      step(event.deltaY > 0 ? 1 : -1);
+      step(direction);
       window.setTimeout(() => {
         wheelLock.current = false;
       }, reducedMotion ? 60 : 200);
@@ -344,7 +364,7 @@ export default function TimelineCorridor({
         setActiveIndex(0);
       } else if (event.key === "End") {
         event.preventDefault();
-        setActiveIndex(filtered.length - 1);
+        setActiveIndex(lastIndex);
       } else if (event.key === "Enter") {
         event.preventDefault();
         setPanelOpen(true);
