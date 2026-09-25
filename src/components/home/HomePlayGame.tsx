@@ -3,7 +3,7 @@
  * Mounted mid-page and again above Let’s talk. Pass unique `id` / `titleId` when repeated.
  */
 
-const GAME_HREF = "https://clickr-run.netlify.app/";
+const GAME_HREF = "https://clickrbrand-run.netlify.app/";
 
 type HomePlayGameProps = {
   id?: string;
@@ -29,7 +29,7 @@ export default function HomePlayGame({
             Clickr Run
           </h2>
           <p className="mt-2 max-w-xl font-sans text-sm leading-relaxed text-white/90 sm:text-base">
-            Ruins await — dodge, jump, and slide through the temple path.
+            Have you Claude it yet? Derick needs to reach his desk — dodge the team.
           </p>
         </div>
         <a
