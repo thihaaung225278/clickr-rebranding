@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   createLetter3D,
   type Letter3DHandle,
@@ -18,9 +19,8 @@ const WORDMARK = {
   height: 156,
 } as const;
 
-/** Live brand CTAs (clickrmedia.com hero). */
-const CTA_HOW_IT_WORKS = "https://www.clickrmedia.com/growth-engine/";
-const CTA_DIAGNOSIS = "https://www.clickrmedia.com/growth-engine/#talk-to-us";
+/** Local reel under `public/video/`. Mounted only while the dialog is open. */
+const CLAUDE_VIDEO_SRC = "/video/just-claude-it.mp4";
 
 type GlyphPhase = "pending" | "filling" | "done";
 
@@ -130,6 +130,12 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
   const [webglOk, setWebglOk] = useState(true);
   const [stageLockPx, setStageLockPx] = useState<number | null>(null);
   const [ledeExpanded, setLedeExpanded] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const videoTitleId = useId();
+  const videoDialogId = useId();
+  const videoDialogRef = useRef<HTMLDivElement>(null);
+  const videoCloseRef = useRef<HTMLButtonElement>(null);
+  const videoOpenerRef = useRef<HTMLButtonElement | null>(null);
   const reducedMotion = usePrefersReducedMotion();
 
   /** Freeze stage height so lede expand grows the banner downward (no WebGL resize flicker). */
@@ -203,8 +209,60 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
   }, [activeIndex]);
 
   useEffect(() => {
-    handleRef.current?.setPaused(reducedMotion || !armed);
-  }, [reducedMotion, armed]);
+    handleRef.current?.setPaused(reducedMotion || !armed || videoOpen);
+  }, [reducedMotion, armed, videoOpen]);
+
+  const closeVideo = useCallback(() => {
+    setVideoOpen(false);
+  }, []);
+
+  const openVideo = (opener: HTMLButtonElement) => {
+    videoOpenerRef.current = opener;
+    setVideoOpen(true);
+  };
+
+  useEffect(() => {
+    if (!videoOpen) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    videoCloseRef.current?.focus();
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeVideo();
+        return;
+      }
+      if (event.key !== "Tab" || !videoDialogRef.current) return;
+
+      const nodes = Array.from(
+        videoDialogRef.current.querySelectorAll<HTMLElement>(
+          "button:not(:disabled), video, a[href]",
+        ),
+      );
+      if (nodes.length === 0) return;
+
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      const current = document.activeElement;
+
+      if (event.shiftKey && current === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && current === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+      videoOpenerRef.current?.focus();
+    };
+  }, [videoOpen, closeVideo]);
 
   // Reduced motion: no water animation — advance on a timer only (after armed).
   useEffect(() => {
@@ -411,26 +469,67 @@ export default function BannerLetterSlider({ armed }: { armed: boolean }) {
               onExpandedChange={setLedeExpanded}
             />
             <div className="banner-slider__cta mt-7 flex flex-wrap gap-3">
-              <a
-                href={CTA_HOW_IT_WORKS}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
                 className="inline-flex items-center justify-center border border-brand bg-brand px-5 py-2.5 font-sans text-xs font-semibold uppercase tracking-wide text-white transition-[transform,background-color,border-color] duration-300 hover:border-[#e85f00] hover:bg-[#e85f00] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)] active:scale-[0.98]"
+                aria-haspopup="dialog"
+                aria-expanded={videoOpen}
+                aria-controls={videoDialogId}
+                onClick={(event) => openVideo(event.currentTarget)}
               >
                 See how it works
-              </a>
-              <a
-                href={CTA_DIAGNOSIS}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center border border-[color-mix(in_oklab,var(--ink)_35%,transparent)] bg-transparent px-5 py-2.5 font-sans text-xs font-semibold uppercase tracking-wide text-[var(--ink)] transition-[transform,border-color,background-color] duration-300 hover:border-[var(--ink)] hover:bg-[color-mix(in_oklab,var(--ink)_6%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--brand)] active:scale-[0.98]"
-              >
-                Get a diagnosis
-              </a>
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {videoOpen
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[90] flex items-center justify-center bg-[color-mix(in_oklab,var(--ink)_42%,transparent)] p-[clamp(0.75rem,3vw,1.5rem)]"
+              role="presentation"
+              onClick={closeVideo}
+            >
+              <div
+                ref={videoDialogRef}
+                id={videoDialogId}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={videoTitleId}
+                className="flex max-h-full w-full max-w-[min(56rem,100%)] flex-col overflow-y-auto bg-white px-[clamp(0.9rem,2.5vw,1.25rem)] py-[clamp(0.85rem,2vw,1.15rem)] shadow-[0_18px_48px_color-mix(in_oklab,var(--ink)_22%,transparent)]"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h2
+                    id={videoTitleId}
+                    className="font-display text-[clamp(1.15rem,2.5vw,1.4rem)] font-bold leading-tight text-[var(--brand)]"
+                  >
+                    Just Claude it
+                  </h2>
+                  <button
+                    ref={videoCloseRef}
+                    type="button"
+                    onClick={closeVideo}
+                    className="shrink-0 rounded-md px-2 py-1 font-sans text-sm text-[var(--ink)] hover:bg-[color-mix(in_oklab,var(--ink)_5%,white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                  >
+                    Close
+                  </button>
+                </div>
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  aria-label="Just Claude it"
+                  className="mt-3 aspect-video w-full bg-black"
+                >
+                  <source src={CLAUDE_VIDEO_SRC} type="video/mp4" />
+                </video>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </section>
   );
 }
