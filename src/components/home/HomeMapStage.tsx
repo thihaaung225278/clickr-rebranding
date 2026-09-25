@@ -7,14 +7,6 @@
 import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-const MAP_STATS = {
-  title: "Clickr Media",
-  rows: [
-    { label: "Number of Offices", value: "1" },
-    { label: "Number of Properties", value: "0" },
-  ],
-} as const;
-
 type CountryPhoto = {
   src: string;
   alt: string;
@@ -35,6 +27,19 @@ type CountryPin = {
   photos: readonly CountryPhoto[];
 };
 
+function countryPhotos(
+  id: string,
+  label: string,
+  files: readonly { file: string; width: number; height: number }[],
+): readonly CountryPhoto[] {
+  return files.map((item, index) => ({
+    src: `/map/countries/${id}/${item.file}`,
+    alt: `${label} photo ${index + 1}`,
+    width: item.width,
+    height: item.height,
+  }));
+}
+
 /** Approximate % positions on world-light.svg (viewBox 950×620). */
 const PINS: readonly CountryPin[] = [
   {
@@ -43,15 +48,23 @@ const PINS: readonly CountryPin[] = [
     left: "87.4%",
     top: "33.5%",
     tone: "dark",
-    photos: [],
+    photos: countryPhotos("japan", "Japan", [
+      { file: "1.jpg", width: 4032, height: 3024 },
+      { file: "2.jpg", width: 4032, height: 3024 },
+      { file: "3.jpg", width: 4032, height: 3024 },
+    ]),
   },
   {
     id: "myanmar",
     label: "Myanmar",
-    left: "72.8%",
-    top: "42.2%",
+    left: "72.4%",
+    top: "42.4%",
     tone: "light",
-    photos: [],
+    photos: countryPhotos("myanmar", "Myanmar", [
+      { file: "1.png", width: 3072, height: 4096 },
+      { file: "2.jpg", width: 3072, height: 4096 },
+      { file: "3.jpg", width: 3072, height: 4096 },
+    ]),
   },
   {
     id: "vietnam",
@@ -59,7 +72,11 @@ const PINS: readonly CountryPin[] = [
     left: "78.6%",
     top: "44.2%",
     tone: "dark",
-    photos: [],
+    photos: countryPhotos("vietnam", "Vietnam", [
+      { file: "1.jpeg", width: 4032, height: 3024 },
+      { file: "2.jpeg", width: 5712, height: 4284 },
+      { file: "3.jpeg", width: 4032, height: 3024 },
+    ]),
   },
   {
     id: "malaysia",
@@ -67,7 +84,11 @@ const PINS: readonly CountryPin[] = [
     left: "77.1%",
     top: "50.2%",
     tone: "light",
-    photos: [],
+    photos: countryPhotos("malaysia", "Malaysia", [
+      { file: "1.jpg", width: 4032, height: 3024 },
+      { file: "2.jpg", width: 4032, height: 3024 },
+      { file: "3.jpg", width: 5712, height: 3213 },
+    ]),
   },
   {
     id: "singapore",
@@ -75,7 +96,11 @@ const PINS: readonly CountryPin[] = [
     left: "78.2%",
     top: "53.6%",
     tone: "dark",
-    photos: [],
+    photos: countryPhotos("singapore", "Singapore", [
+      { file: "1.jpg", width: 1728, height: 3072 },
+      { file: "2.jpg", width: 3840, height: 2160 },
+      { file: "3.jpg", width: 2976, height: 1680 },
+    ]),
   },
 ];
 
@@ -255,32 +280,6 @@ export default function HomeMapStage() {
           </button>
         ))}
       </div>
-
-      {/* Stats card */}
-      <aside
-        aria-label={`${MAP_STATS.title} presence`}
-        className="pointer-events-none absolute left-[clamp(0.75rem,3vw,1.5rem)] top-[clamp(0.75rem,3vw,1.5rem)] z-40 w-[min(14.5rem,72%)] rounded-lg bg-white px-[clamp(0.85rem,2.5vw,1.15rem)] py-[clamp(0.75rem,2vw,1rem)] shadow-[0_6px_20px_color-mix(in_oklab,var(--ink)_14%,transparent)] sm:w-[15.5rem]"
-      >
-        <p className="font-display text-[clamp(0.95rem,2.2vw,1.05rem)] font-bold leading-tight text-[var(--brand)]">
-          {MAP_STATS.title}
-        </p>
-        <div
-          className="mt-2.5 border-t border-[color-mix(in_oklab,var(--ink)_12%,transparent)]"
-          aria-hidden="true"
-        />
-        <dl className="mt-3 space-y-3">
-          {MAP_STATS.rows.map((row) => (
-            <div key={row.label}>
-              <dt className="font-sans text-[0.75rem] leading-snug text-[var(--ink-muted)] sm:text-[0.8125rem]">
-                {row.label}
-              </dt>
-              <dd className="mt-0.5 font-display text-[clamp(1.35rem,3vw,1.65rem)] font-bold leading-none tracking-tight text-[var(--ink)]">
-                {row.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </aside>
 
       {/* Zoom controls */}
       <div

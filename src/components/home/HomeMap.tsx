@@ -1,6 +1,6 @@
 /**
  * Home location map — flat world map, country pins, photo popup.
- * Replace MAP_STATS (in HomeMapStage) when real figures land.
+ * Country pins open a photo dialog.
  */
 
 import HomeMapStage from "./HomeMapStage";
@@ -18,10 +18,10 @@ export default function HomeMap() {
             id="home-map-title"
             className="font-display text-[clamp(1.75rem,4vw,2.75rem)] font-bold tracking-tight text-[var(--ink)]"
           >
-            Visit us
+            Connecting the Clicks
           </h2>
           <p className="mt-4 font-sans text-base leading-relaxed text-[var(--ink-muted)] sm:text-lg">
-            Tap a pin to see photos from that country.
+            Where the work clicks, and so do we.
           </p>
         </div>
       </div>
