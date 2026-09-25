@@ -4,8 +4,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  /* Above the culture photo dialog (z-80); below the intro overlay (z-100). */
-  z-index: 90;
+  /* Above the culture photo dialog (80) and the banner video dialog (90); below the intro overlay (100). */
+  z-index: 95;
   margin: 0;
   padding: 0;
   pointer-events: none;
