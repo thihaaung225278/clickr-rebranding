@@ -20,6 +20,8 @@ const NAV = [
   { href: "#play-game", label: "Clickr Run" },
   { href: "#company-timeline", label: "Company Timeline" },
   { href: "#lets-talk", label: "Let's talk" },
+  { href: "#visit", label: "Visit us" },
+  { href: "#watch", label: "Watch Clickr" },
 ] as const;
 
 /** FB/IG from Clickr public profiles; YT/TikTok — confirm if handles differ. */

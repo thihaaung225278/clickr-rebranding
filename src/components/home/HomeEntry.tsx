@@ -6,9 +6,11 @@ import HandStrokeIntro from "./HandStrokeIntro";
 import HomeHero from "./HomeHero";
 import HomeFooter from "./HomeFooter";
 import HomeLetsTalk from "./HomeLetsTalk";
+import HomeMap from "./HomeMap";
 import HomeMenu from "./HomeMenu";
 import HomePlayGame from "./HomePlayGame";
 import HomeTimeline from "./HomeTimeline";
+import HomeVideo from "./HomeVideo";
 import OurServices from "./OurServices";
 
 /**
@@ -27,11 +29,13 @@ export default function HomeEntry() {
         <OurServices />
         <HomePlayGame />
         <HomeTimeline />
-        <HomeLetsTalk />
         <HomePlayGame
           id="play-game-footer"
           titleId="home-play-game-title-footer"
         />
+        <HomeLetsTalk />
+        <HomeMap />
+        <HomeVideo />
       </main>
       <HomeFooter />
     </HandStrokeIntro>

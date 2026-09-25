@@ -1,6 +1,6 @@
 /**
  * Home Clickr Run CTA — brand band; copy left, Play Game right.
- * Mounted mid-page and again above the footer. Pass unique `id` / `titleId` when repeated.
+ * Mounted mid-page and again above Let’s talk. Pass unique `id` / `titleId` when repeated.
  */
 
 const GAME_HREF = "https://clickr-run.netlify.app/";
