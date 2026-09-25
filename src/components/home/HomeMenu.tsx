@@ -8,7 +8,9 @@ const LINKS = [
   { href: "#home", label: "Home", index: "01" },
   { href: "#our-services", label: "Our Services", index: "02" },
   { href: "#company-timeline", label: "Company Timeline", index: "03" },
-  { href: "#lets-talk", label: "Let's talk", index: "04" },
+  { href: "#play-game", label: "Clickr Run", index: "04" },
+  { href: "#life-culture", label: "Life / culture", index: "05" },
+  { href: "#lets-talk", label: "Let's talk", index: "06" },
 ] as const;
 
 /** Same asset as banner rail — 560×156 source. */

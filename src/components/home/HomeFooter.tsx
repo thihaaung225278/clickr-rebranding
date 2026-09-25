@@ -17,8 +17,9 @@ const WORDMARK = {
 const NAV = [
   { href: "#home", label: "Home" },
   { href: "#our-services", label: "Our Services" },
-  { href: "#play-game", label: "Clickr Run" },
   { href: "#company-timeline", label: "Company Timeline" },
+  { href: "#play-game", label: "Clickr Run" },
+  { href: "#life-culture", label: "Life / culture" },
   { href: "#lets-talk", label: "Let's talk" },
 ] as const;
 

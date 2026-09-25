@@ -4,7 +4,9 @@ import { useCallback, useState } from "react";
 import BrandCursor from "./BrandCursor";
 import HandStrokeIntro from "./HandStrokeIntro";
 import HomeHero from "./HomeHero";
+import HomeCultureMap from "./HomeCultureMap";
 import HomeFooter from "./HomeFooter";
+import HomeFullVideo from "./HomeFullVideo";
 import HomeLetsTalk from "./HomeLetsTalk";
 import HomeMenu from "./HomeMenu";
 import HomePlayGame from "./HomePlayGame";
@@ -25,13 +27,11 @@ export default function HomeEntry() {
       <main className="flex flex-1 flex-col bg-[var(--surface)] text-[var(--ink)]">
         <HomeHero armed={armed} />
         <OurServices />
-        <HomePlayGame />
         <HomeTimeline />
+        <HomePlayGame />
+        <HomeCultureMap />
+        <HomeFullVideo armed={armed} />
         <HomeLetsTalk />
-        <HomePlayGame
-          id="play-game-footer"
-          titleId="home-play-game-title-footer"
-        />
       </main>
       <HomeFooter />
     </HandStrokeIntro>

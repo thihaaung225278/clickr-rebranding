@@ -1,0 +1,13 @@
+/* Full-video row. GSAP staggers the columns in; this is the resting state. */
+
+.life-film__lead,
+.life-film__col {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .life-film__lead,
+  .life-film__col {
+    transform: none;
+  }
+}

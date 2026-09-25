@@ -1,0 +1,21 @@
+.culture-popup {
+  animation: culture-emerge 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes culture-emerge {
+  from {
+    opacity: 0;
+    transform: translateY(12%);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .culture-popup {
+    animation: none;
+  }
+}
