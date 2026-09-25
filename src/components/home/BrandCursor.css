@@ -4,7 +4,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 80;
+  /* Above the banner video dialog (90), below the intro overlay (100). */
+  z-index: 95;
   margin: 0;
   padding: 0;
   pointer-events: none;

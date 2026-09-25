@@ -97,7 +97,7 @@ const PINS: readonly CountryPin[] = [
     top: "53.6%",
     tone: "dark",
     photos: countryPhotos("singapore", "Singapore", [
-      { file: "1.jpg", width: 1728, height: 3072 },
+      { file: "1.jpg", width: 2048, height: 869 },
       { file: "2.jpg", width: 3840, height: 2160 },
       { file: "3.jpg", width: 2976, height: 1680 },
     ]),
@@ -322,7 +322,7 @@ export default function HomeMapStage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="flex max-h-full w-full max-w-[28rem] flex-col overflow-y-auto rounded-lg bg-white px-[clamp(0.9rem,2.5vw,1.25rem)] py-[clamp(0.85rem,2vw,1.15rem)] shadow-[0_12px_32px_color-mix(in_oklab,var(--ink)_22%,transparent)]"
+            className="flex max-h-full w-full max-w-[min(36rem,94vw)] flex-col overflow-y-auto rounded-lg bg-white px-[clamp(0.9rem,2.5vw,1.25rem)] py-[clamp(0.85rem,2vw,1.15rem)] shadow-[0_12px_32px_color-mix(in_oklab,var(--ink)_22%,transparent)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -345,13 +345,13 @@ export default function HomeMapStage() {
 
             {photo ? (
               <div className="mt-3">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-[var(--surface)]">
+                <div className="relative aspect-[21/9] overflow-hidden rounded-md bg-[var(--surface)] sm:aspect-[2/1]">
                   <Image
                     src={photo.src}
                     alt={photo.alt}
                     fill
-                    sizes="(max-width: 40rem) 90vw, 28rem"
-                    className="object-cover"
+                    sizes="(max-width: 40rem) 94vw, 36rem"
+                    className="object-contain"
                   />
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3">
